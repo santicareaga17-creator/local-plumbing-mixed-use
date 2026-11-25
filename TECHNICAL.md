@@ -42,7 +42,7 @@ NitroPack page cache, Cloudflare in front.
 │   ├── assets/               Mirror of the live site's /wp-content and /wp-includes files (79 files)
 │   ├── vercel.json           Vercel config: clean URLs, noindex header, asset caching
 │   └── .vercelignore         Keeps build.py and content.html off the CDN
-├── design-assets/            Exported banners, icons and UI elements (see its README)
+├── design-assets/            home-banners, banners, flat-icons, web-elements, icons (see its README)
 ├── html-snapshots/           Live pages as served 2026-11-24 (build input + reference)
 ├── docs/                     Strategy, SEO and final copy (non-technical)
 ├── README.md                 Project overview

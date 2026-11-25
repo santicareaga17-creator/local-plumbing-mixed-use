@@ -79,7 +79,7 @@ pushing.
 │   ├── index.html      Build output (committed; this is what Vercel serves)
 │   ├── assets/         Theme CSS/JS, icons and photos, mirrored from the live site
 │   └── vercel.json     Clean URLs, noindex header, asset caching
-├── design-assets/      home-banners/, banners/, flat-icons/, web-elements/
+├── design-assets/      home-banners/, banners/, flat-icons/, web-elements/, icons/
 ├── docs/               Strategy and copy (see below)
 ├── html-snapshots/     The live pages as served on 2026-11-24, desktop and mobile
 └── TECHNICAL.md        Technical spec for developers

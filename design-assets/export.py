@@ -8,6 +8,7 @@ Needs Google Chrome (headless) and Pillow. Writes:
   banners/       full-width section banners, rendered, plus their source photos
   flat-icons/    service icons (PNG) and the inline line icons (SVG)
   web-elements/  buttons, cards, form, header, footer, rendered at 1440 px
+  icons/         favicons, UI and social icons (SVG), logos and badges
 """
 import json, re, shutil, subprocess, tempfile
 from pathlib import Path
@@ -54,6 +55,39 @@ SVG_NAMES = {1: "arrow-up-pressure", 2: "storefront-tenant", 3: "water-drop-hot-
              5: "water-drop", 6: "pipe-flow", 7: "clipboard-checklist"}
 
 
+FOLDERS = ("home-banners", "banners", "flat-icons", "web-elements", "icons")
+FONTS = SITE / "assets/wp-content/themes/jm-understrap-child/assets/dist/fonts"
+# Font Awesome 5 glyphs the page uses (Free license: CC BY 4.0)
+FA_GLYPHS = {"ui": ("fa-solid-900.svg", ["phone", "phone-alt", "angle-left", "angle-right", "map-marker-alt"]),
+             "social": ("fa-brands-400.svg", ["facebook-f", "instagram"])}
+ICON_FILES = {
+    "favicon": ["2020/01/local-plumbing-favicon-32x32-1.png", "2020/01/local-plumbing-favicon-32x32-1-150x150.png"],
+    "ui": ["2020/03/icon_check.png"],
+    "logos-badges": ["2020/01/local-plumbing-logo.png", "2023/02/local_footer_logo.png", "2025/04/SBA-Logo.png",
+                     "2020/10/PHCC_blk.png", "2025/01/ABC_member.png", "2025/02/Google-Review-Logo-ftr.png"],
+}
+
+
+def export_icons():
+    out = ROOT / "icons"
+    for sub, files in ICON_FILES.items():
+        (out / sub).mkdir(parents=True, exist_ok=True)
+        for f in files:
+            shutil.copy2(UPLOADS / f, out / sub / Path(f).name)
+    for sub, (font, names) in FA_GLYPHS.items():
+        (out / sub).mkdir(parents=True, exist_ok=True)
+        svg = (FONTS / font).read_text(encoding="utf-8")
+        default_w = re.search(r'<font [^>]*horiz-adv-x="(\d+)"', svg).group(1)
+        for name in names:
+            g = re.search(r'<glyph glyph-name="%s"([^>]*?)/>' % re.escape(name), svg, re.S).group(1)
+            d = re.search(r'\bd="([^"]+)"', g).group(1)
+            w = (re.search(r'horiz-adv-x="(\d+)"', g) or [None, default_w])[1]
+            # SVG-font glyphs are y-up with ascent 448 / descent -64: flip into a normal viewBox
+            (out / sub / f"{name}.svg").write_text(
+                f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} 512" fill="currentColor">'
+                f'<path transform="translate(0 448) scale(1 -1)" d="{d}"/></svg>\n')
+
+
 def chrome(args):
     subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
                     f"--user-data-dir={tempfile.mkdtemp()}", "--virtual-time-budget=15000", *args],
@@ -93,7 +127,7 @@ def crop(img, rect, out):
 
 
 def main():
-    for d in ("home-banners", "banners", "flat-icons", "web-elements"):
+    for d in FOLDERS:
         shutil.rmtree(ROOT / d, ignore_errors=True)
 
     for width in (1440, 768):
@@ -124,7 +158,9 @@ def main():
             '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" '
             'stroke="#1f1f1f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + body + "</svg>\n")
 
-    for d in ("home-banners", "banners", "flat-icons", "web-elements"):
+    export_icons()
+
+    for d in FOLDERS:
         n = sum(1 for p in (ROOT / d).rglob("*") if p.is_file())
         print(f"{d}: {n} files")
 

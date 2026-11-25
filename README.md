@@ -26,7 +26,7 @@ theme section by section.
 | | |
 | --- | --- |
 | Production | <https://local-plumbing-mixed-use.vercel.app> |
-| Vercel project | `local-plumbing-mixed-use` (deployed from `site/`) |
+| Vercel project | `local-plumbing-mixed-use` — auto-deploys from `main`, Root Directory `site/` |
 | Content source | `site/content.html` |
 | Build | `site/build.py` (Python 3, standard library only) |
 | Output | `site/index.html` + 79 files in `site/assets/` |
@@ -60,9 +60,10 @@ Barlow fonts come from Google Fonts.
 
 ### Deploy
 
-```bash
-cd site && vercel deploy --prod
-```
+The repo is connected to the Vercel project: **every push to `main` deploys to
+production**, and other branches get preview URLs. Vercel's Root Directory is `site/`,
+with no build step, so run `python3 site/build.py` and commit `site/index.html` before
+pushing.
 
 `site/.vercelignore` keeps `build.py` and `content.html` off the server.
 
